@@ -8,20 +8,52 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: archlinux:latest
+      image: artixlinux/base
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Build Tools
+      - name: Install Build Dependencies
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm \
             base-devel \
             git \
+            gcc \
             meson \
-            ninja
+            ninja \
+            just \
+            wayland \
+            wayland-protocols \
+            libglvnd \
+            freetype2 \
+            fontconfig \
+            cairo \
+            pango \
+            harfbuzz \
+            libxkbcommon \
+            glib2 \
+            libsecret \
+            libsodium \
+            sdbus-cpp \
+            pipewire \
+            wireplumber \
+            polkit \
+            pam \
+            curl \
+            libwebp \
+            libjxl \
+            libsndfile \
+            librsvg \
+            libqalculate \
+            libxml2 \
+            md4c \
+            tomlplusplus \
+            libical \
+            nlohmann-json \
+            stb \
+            jemalloc
 
       - name: Create Builder User
         run: |
