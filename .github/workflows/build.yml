@@ -1,0 +1,37 @@
+name: Build Packages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: artixlinux/base
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          pacman -Sy --noconfirm base-devel git pacman-contrib
+
+      - name: Build noctalia
+        run: |
+          cd noctalia-git
+          makepkg -s --noconfirm
+
+      - name: Create repository
+        run: |
+          mkdir -p repo/x86_64
+          cp noctalia-git/*.pkg.tar.zst repo/x86_64/
+          repo-add repo/x86_64/gnuslash.db.tar.gz repo/x86_64/*.pkg.tar.zst
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gnuslash-repo
+          path: repo/
