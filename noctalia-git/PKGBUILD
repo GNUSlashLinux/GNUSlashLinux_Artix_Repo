@@ -1,18 +1,54 @@
 pkgname=noctalia-git
-pkgver=0.1.r0
+pkgver=0
 pkgrel=1
-pkgdesc="Noctalia Shell for GNUSlashLinux"
-arch=('any')
+pkgdesc="A sleek, customizable desktop shell crafted for Wayland."
+arch=('x86_64')
 url="https://github.com/noctalia-dev/noctalia"
-license=('GPL')
+license=('MIT')
 
 depends=(
-    qt6-base
-    qt6-declarative
+    wayland
+    wayland-protocols
+    libglvnd
+    freetype2
+    fontconfig
+    cairo
+    pango
+    harfbuzz
+    libxkbcommon
+    glib2
+    libsecret
+    libsodium
+    sdbus-cpp
+    libpipewire
+    wireplumber
+    polkit
+    pam
+    curl
+    libwebp
+    libjxl
+    libsndfile
+    librsvg
+    libqalculate
+    libxml2
+    md4c
+    tomlplusplus
+    libical
+    nlohmann-json
+    stb
+)
+
+optdepends=(
+    'upower: battery information'
+    'ddcutil: monitor brightness control'
+    'git: plugin auto-update support'
 )
 
 makedepends=(
     git
+    meson
+    ninja
+    gcc
 )
 
 source=(
@@ -23,14 +59,21 @@ sha256sums=('SKIP')
 
 pkgver() {
     cd noctalia
-    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+
+    printf "r%s.%s" \
+        "$(git rev-list --count HEAD)" \
+        "$(git rev-parse --short HEAD)"
+}
+
+build() {
+    arch-meson noctalia build \
+        -Dbuildtype=release \
+        -Dtests=disabled
+
+    meson compile -C build
 }
 
 package() {
-    cd noctalia
-
-    mkdir -p "$pkgdir/usr/share/noctalia"
-
-    cp -r ./* "$pkgdir/usr/share/noctalia/"
+    meson install -C build \
+        --destdir "$pkgdir"
 }
-``
