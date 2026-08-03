@@ -20,7 +20,7 @@ depends=(
     libsecret
     libsodium
     sdbus-cpp
-    libpipewire
+    pipewire
     wireplumber
     polkit
     pam
@@ -36,12 +36,12 @@ depends=(
     libical
     nlohmann-json
     stb
+    jemalloc
 )
 
 optdepends=(
-    'upower: battery information'
+    'upower: battery integration'
     'ddcutil: monitor brightness control'
-    'git: plugin auto-update support'
 )
 
 makedepends=(
@@ -52,28 +52,32 @@ makedepends=(
 )
 
 source=(
-    "git+https://github.com/noctalia-dev/noctalia.git"
+    "noctalia::git+https://github.com/noctalia-dev/noctalia.git"
 )
 
 sha256sums=('SKIP')
 
 pkgver() {
     cd noctalia
-
     printf "r%s.%s" \
         "$(git rev-list --count HEAD)" \
         "$(git rev-parse --short HEAD)"
 }
 
 build() {
-    arch-meson noctalia build \
-        -Dbuildtype=release \
+    cd noctalia
+
+    meson setup build \
+        --prefix=/usr \
+        --buildtype=release \
         -Dtests=disabled
 
     meson compile -C build
 }
 
 package() {
+    cd noctalia
+
     meson install -C build \
         --destdir "$pkgdir"
 }
