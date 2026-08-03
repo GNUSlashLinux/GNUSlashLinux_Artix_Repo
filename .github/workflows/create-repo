@@ -1,9 +1,0 @@
-- name: Create Repository
-  run: |
-    mkdir -p repo/x86_64
-
-    cp noctalia-git/*.pkg.tar.zst repo/x86_64/
-
-    repo-add \
-      repo/x86_64/gnuslashlinux.db.tar.gz \
-      repo/x86_64/*.pkg.tar.zst
