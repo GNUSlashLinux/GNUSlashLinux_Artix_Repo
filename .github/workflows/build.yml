@@ -44,6 +44,7 @@ jobs:
             pipewire \
             wireplumber \
             polkit \
+            pam \
             curl \
             libwebp \
             libjxl \
