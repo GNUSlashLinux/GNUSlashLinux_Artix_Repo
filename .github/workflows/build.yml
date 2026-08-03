@@ -1,4 +1,4 @@
-name: Build Noctalia Package
+name: Build and deploy Packages
 
 on:
   workflow_dispatch:
