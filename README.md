@@ -1,0 +1,2 @@
+# GNUSlashLinux_Artix_Repo
+GNUSlashLinux_Artix_Repo
