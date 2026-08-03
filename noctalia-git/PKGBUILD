@@ -1,0 +1,36 @@
+pkgname=noctalia-git
+pkgver=0.1.r0
+pkgrel=1
+pkgdesc="Noctalia Shell for GNUSlashLinux"
+arch=('any')
+url="https://github.com/noctalia-dev/noctalia"
+license=('GPL')
+
+depends=(
+    qt6-base
+    qt6-declarative
+)
+
+makedepends=(
+    git
+)
+
+source=(
+    "git+https://github.com/noctalia-dev/noctalia.git"
+)
+
+sha256sums=('SKIP')
+
+pkgver() {
+    cd noctalia
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+package() {
+    cd noctalia
+
+    mkdir -p "$pkgdir/usr/share/noctalia"
+
+    cp -r ./* "$pkgdir/usr/share/noctalia/"
+}
+``
