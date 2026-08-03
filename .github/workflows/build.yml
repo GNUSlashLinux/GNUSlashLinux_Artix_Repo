@@ -32,7 +32,7 @@ jobs:
         run: |
           su builder -c "
             cd $GITHUB_WORKSPACE/noctalia-git &&
-            makepkg -sfc --noconfirm
+            makepkg -fc --noconfirm
           "
 
       - name: Upload Package
