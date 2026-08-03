@@ -3,6 +3,9 @@ name: Build Noctalia Package
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +27,7 @@ jobs:
           pacman -Syu --noconfirm
           pacman -S --needed --noconfirm \
             base-devel \
+            pacman-contrib \
             git \
             gcc \
             meson \
@@ -71,8 +75,19 @@ jobs:
             makepkg -fc --noconfirm
           "
 
-      - name: Upload Package
-        uses: actions/upload-artifact@v4
+      - name: Create Repository
+        run: |
+          mkdir -p deploy/repo/x86_64
+
+          cp noctalia-git/*.pkg.tar.zst deploy/repo/x86_64/
+
+          repo-add \
+            deploy/repo/x86_64/gnuslashlinux.db.tar.gz \
+            deploy/repo/x86_64/*.pkg.tar.zst
+
+      - name: Deploy GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          name: noctalia-package
-          path: noctalia-git/*.pkg.tar.zst
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: deploy
