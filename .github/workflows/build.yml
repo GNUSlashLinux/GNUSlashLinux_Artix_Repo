@@ -1,22 +1,20 @@
-name: Build Noctalia
+name: Build Noctalia Package
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     container:
       image: archlinux:latest
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - uses: actions/checkout@v4
-
-      - name: Install build tools
+      - name: Install Build Tools
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm \
@@ -25,12 +23,19 @@ jobs:
             meson \
             ninja
 
-      - name: Build package
+      - name: Create Builder User
         run: |
-          cd noctalia-git
-          makepkg -sfc --noconfirm
+          useradd -m builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
 
-      - name: Upload package
+      - name: Build Package
+        run: |
+          su builder -c "
+            cd $GITHUB_WORKSPACE/noctalia-git &&
+            makepkg -sfc --noconfirm
+          "
+
+      - name: Upload Package
         uses: actions/upload-artifact@v4
         with:
           name: noctalia-package
