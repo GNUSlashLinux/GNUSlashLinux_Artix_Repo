@@ -8,22 +8,26 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: artixlinux/base
+      image: archlinux:latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Initialize pacman
+        run: |
+          pacman-key --init
+          pacman-key --populate archlinux
+
       - name: Install Build Dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm \
+          pacman -S --needed --noconfirm \
             base-devel \
             git \
             gcc \
             meson \
             ninja \
-            just \
             wayland \
             wayland-protocols \
             libglvnd \
@@ -40,7 +44,6 @@ jobs:
             pipewire \
             wireplumber \
             polkit \
-            pam \
             curl \
             libwebp \
             libjxl \
