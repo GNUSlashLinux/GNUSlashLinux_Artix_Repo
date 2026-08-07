@@ -16,8 +16,6 @@ SigLevel = Optional TrustAll
 Server = https://gnuslashlinux.github.io/GNUSlashLinux_Artix_Repo/x86_64
 ```
 
-> ⚠️ **Hinweis:** Stellen Sie sicher, dass Sie `IhrGitHubUsername` durch Ihren tatsächlichen GitHub-Benutzernamen ersetzen und GitHub Pages in den Repository-Einstellungen für den `main`-Branch (Root-Verzeichnis) aktiviert haben.
-
 ### Datenbank aktualisieren
 
 Nachdem Sie die `pacman.conf` gespeichert haben, synchronisieren Sie die Paketdatenbanken mit:
