@@ -41,10 +41,17 @@ jobs:
         repo-add GNUSlashLinux.db.tar.zst *.pkg.tar.zst
 
     - name: Änderungen zurück in das Repo pushen
+      env:
+        # Erlaubt Git, die Verzeichnisgrenzen des Docker-Mountpoints zu durchsuchen
+        GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
       run: |
-        # Wechselt explizit in das Git-Hauptverzeichnis des Workflows
+        # Wechselt in das Verzeichnis
         cd "$GITHUB_WORKSPACE"
         
+        # Schaltet die Sicherheitsprüfung für dieses Verzeichnis direkt in dieser Shell ab
+        git config --global --add safe.directory '*'
+        
+        # Git-Aktionen ausführen
         git add x86_64/GNUSlashLinux.*
         if ! git diff-index --quiet HEAD; then
           git commit -m "Automatisches DB-Update (GNUSlashLinux)"
