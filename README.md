@@ -13,7 +13,7 @@ Um dieses Repository in Ihrem System (oder in der Live-ISO-Konfiguration) zu akt
 ```ini
 [GNUSlashLinux]
 SigLevel = Optional TrustAll
-Server = https://github.io
+Server = https://gnuslashlinux.github.io/GNUSlashLinux_Artix_Repo/x86_64
 ```
 
 > ⚠️ **Hinweis:** Stellen Sie sicher, dass Sie `IhrGitHubUsername` durch Ihren tatsächlichen GitHub-Benutzernamen ersetzen und GitHub Pages in den Repository-Einstellungen für den `main`-Branch (Root-Verzeichnis) aktiviert haben.
