@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'x86_64/*.pkg.tar.zst'
+  workflow_dispatch: # Erlaubt den manuellen Start über die GitHub-Oberfläche
 
 # Verhindert Race Conditions, falls mehrere Pakete kurz nacheinander gepusht werden
 concurrency:
