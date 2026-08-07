@@ -42,6 +42,9 @@ jobs:
 
     - name: Änderungen zurück in das Repo pushen
       run: |
+        # Wechselt explizit in das Git-Hauptverzeichnis des Workflows
+        cd "$GITHUB_WORKSPACE"
+        
         git add x86_64/GNUSlashLinux.*
         if ! git diff-index --quiet HEAD; then
           git commit -m "Automatisches DB-Update (GNUSlashLinux)"
