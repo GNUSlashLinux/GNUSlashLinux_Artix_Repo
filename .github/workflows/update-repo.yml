@@ -10,11 +10,14 @@ concurrency:
   group: repository-update
   cancel-in-progress: false
 
+# HIER HINZUFÜGEN: Erlaubt dem GitHub-Token das Schreiben im Repo
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    # HINWEIS: Kein globaler Container mehr! Wir laufen nativ auf dem Ubuntu-Host.
-
+    
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -23,7 +26,6 @@ jobs:
 
     - name: GNUSlashLinux Datenbank aktualisieren (via Arch Docker)
       run: |
-        # Wir starten das Arch-Image nur kurz isoliert, um die DB zu bauen
         docker run --rm -v ${{ github.workspace }}:/repo -w /repo archlinux:latest sh -c "
           pacman -Syu --noconfirm pacman-contrib
           cd x86_64
@@ -35,7 +37,6 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@://github.com"
         
-        # Auf dem Ubuntu-Host gibt es keinerlei "not a git repository" Fehler mehr
         git add x86_64/GNUSlashLinux.*
         if ! git diff-index --quiet HEAD; then
           git commit -m "Automatisches DB-Update (GNUSlashLinux)"
