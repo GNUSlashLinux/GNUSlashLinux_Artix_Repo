@@ -1,0 +1,21 @@
+title: repo.GNUSlashLinux
+description: Official GNUSlashLinux Package Repository
+
+# Lädt das Konsolen-Theme
+remote_theme: b2a3e8/jekyll-theme-console
+
+# Schaltet das Design exakt auf die Nord-Farbpalette um
+style: nord
+
+# Google Fonts deaktivieren
+disable_google_fonts: true
+
+plugins:
+  - jekyll-remote-theme
+
+# Zwingt Jekyll, den Paket-Ordner für Pacman bereitzustellen
+include:
+  - "x86_64"
+
+# Fügt das Copyright mit echten HTML-Links im Footer hinzu
+footer: "Copyright &copy; 2026 <a href='https://www.gnuslashlinux.com' target='_blank' style='color: #88C0D0;'>GNUSlashLinux</a> | Powered By <a href='https://www.alien-tec.com' target='_blank' style='color: #88C0D0;'>Alien-Tec</a> | Alle Rechte vorbehalten."
