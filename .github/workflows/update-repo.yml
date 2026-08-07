@@ -4,9 +4,8 @@ on:
   push:
     paths:
       - 'x86_64/*.pkg.tar.zst'
-  workflow_dispatch: # Erlaubt den manuellen Start über die GitHub-Oberfläche
+  workflow_dispatch:
 
-# Verhindert Race Conditions, falls mehrere Pakete kurz nacheinander gepusht werden
 concurrency:
   group: repository-update
   cancel-in-progress: false
@@ -14,44 +13,29 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:latest
+    # HINWEIS: Kein globaler Container mehr! Wir laufen nativ auf dem Ubuntu-Host.
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        # Nutzt den Standard-Token für Schreibrechte
-        token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: System aktualisieren und Git konfigurieren
+    - name: GNUSlashLinux Datenbank aktualisieren (via Arch Docker)
       run: |
-        pacman -Syu --noconfirm git pacman-contrib
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@://github.com"
-        # Registriert explizit das aktuelle Verzeichnis und alle Unterordner als sicher
-        git config --global --add safe.directory '*'
-
-    - name: GNUSlashLinux Datenbank aktualisieren
-      run: |
-        cd x86_64
-        # repo-add benötigt den Namen OHNE Suffix für die Symlink-Erstellung
-        # Vorherige DB-Dateien NICHT löschen, da repo-add inkrementell arbeitet
-        repo-add GNUSlashLinux.db.tar.zst *.pkg.tar.zst
+        # Wir starten das Arch-Image nur kurz isoliert, um die DB zu bauen
+        docker run --rm -v ${{ github.workspace }}:/repo -w /repo archlinux:latest sh -c "
+          pacman -Syu --noconfirm pacman-contrib
+          cd x86_64
+          repo-add GNUSlashLinux.db.tar.zst *.pkg.tar.zst
+        "
 
     - name: Änderungen zurück in das Repo pushen
-      env:
-        # Erlaubt Git, die Verzeichnisgrenzen des Docker-Mountpoints zu durchsuchen
-        GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
       run: |
-        # Wechselt in das Verzeichnis
-        cd "$GITHUB_WORKSPACE"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@://github.com"
         
-        # Schaltet die Sicherheitsprüfung für dieses Verzeichnis direkt in dieser Shell ab
-        git config --global --add safe.directory '*'
-        
-        # Git-Aktionen ausführen
+        # Auf dem Ubuntu-Host gibt es keinerlei "not a git repository" Fehler mehr
         git add x86_64/GNUSlashLinux.*
         if ! git diff-index --quiet HEAD; then
           git commit -m "Automatisches DB-Update (GNUSlashLinux)"
