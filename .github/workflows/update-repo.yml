@@ -3,39 +3,45 @@ name: Update GNUSlashLinux Repository
 on:
   push:
     paths:
-      - 'x86_64/*.pkg.tar.zst' # Workflow startet nur bei neuen Paket-Uploads
+      - 'x86_64/*.pkg.tar.zst'
+
+# Verhindert Race Conditions, falls mehrere Pakete kurz nacheinander gepusht werden
+concurrency:
+  group: repository-update
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: archlinux:latest # Nutzt das Arch-Image, da repo-add dort enthalten ist
+      image: archlinux:latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        # Nutzt den Standard-Token für Schreibrechte
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: System aktualisieren und Git konfigurieren
       run: |
         pacman -Syu --noconfirm git pacman-contrib
         git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@://github.com"
-        # Verhindert Berechtigungskonflikte innerhalb des Docker-Containers
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
     - name: GNUSlashLinux Datenbank aktualisieren
       run: |
         cd x86_64
-        # Löscht die alten Datenbankdateien und Symlinks vor der Neugenerierung
-        rm -f GNUSlashLinux.db GNUSlashLinux.db.tar.gz GNUSlashLinux.files GNUSlashLinux.files.tar.gz
-        # Generiert die Datenbank komplett neu aus allen im Ordner liegenden Paketen
-        repo-add GNUSlashLinux.db.tar.gz *.pkg.tar.zst
+        # repo-add benötigt den Namen OHNE Suffix für die Symlink-Erstellung
+        # Vorherige DB-Dateien NICHT löschen, da repo-add inkrementell arbeitet
+        repo-add GNUSlashLinux.db.tar.zst *.pkg.tar.zst
 
     - name: Änderungen zurück in das Repo pushen
       run: |
-        git add x86_64/GNUSlashLinux.db* x86_64/GNUSlashLinux.files*
-        # Commit und Push werden nur ausgeführt, wenn sich die Datenbank tatsächlich geändert hat
-        git diff-index --quiet HEAD || git commit -m "Automatisches DB-Update (GNUSlashLinux)"
-        git push origin main
+        git add x86_64/GNUSlashLinux.*
+        if ! git diff-index --quiet HEAD; then
+          git commit -m "Automatisches DB-Update (GNUSlashLinux)"
+          git push origin main
+        fi
